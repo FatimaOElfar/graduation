@@ -1,6 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import User from "../Structure/User.js";
+import Cv from "../Structure/Cv.js";
 
 const getUserByUsername = async (models, username) => {
   return await models.user.findOne({
@@ -42,10 +43,10 @@ const startServer = (models) => {
       username,
       password,
     } = req.body;
-    const foundUser = await getUserByUsername(models, username);
     const isNotValid = checkPasswordValidation(password);
     if (isNotValid) return res.send({ error: isNotValid });
 
+    const foundUser = await getUserByUsername(models, username);
     if (foundUser)
       return res.send({ error: "User already exists with that username." });
 
@@ -67,6 +68,13 @@ const startServer = (models) => {
     return res.send({ success: "User was created", user });
   });
 
+  // CV HANDLER
+  app.get(`${API_URL}/cv/:username`, async (req, res) => {
+    const cv = new Cv(models, req.params.username);
+    await cv.load(models);
+    cv.user = null;
+    return res.send({ cv });
+  });
   // SIGN IN HANDLER
   app.post(`${API_URL}/signin`, async (req, res) => {
     const { username, password } = req.body;

@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import User from "../Structure/User.js";
+import Cv from "../Structure/Cv.js";
 
 export default {
   connect: (models) => {
@@ -8,8 +9,7 @@ export default {
       .then(async () => {
         console.log("MongoDB was connected.");
         models.user = new User().schema();
-
-        await models.user.updateOne({}, { "education.test": "test" });
+        models.cv = new Cv().schema();
       })
       .catch((error) => {
         console.log("Failed to connect to MongoDB");
