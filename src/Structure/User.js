@@ -1,5 +1,6 @@
 import { v4 as uuid } from "uuid";
 import mongoose, { Schema } from "mongoose";
+
 export default class User {
   constructor(user) {
     this.id = user?.id || uuid();
@@ -24,7 +25,7 @@ export default class User {
   }
   schema = () => {
     const model = mongoose.model(
-      "authentication",
+      "user",
       new Schema({
         id: String,
         email: String,
@@ -35,7 +36,7 @@ export default class User {
     );
     return model;
   };
-  save = async (model) => {
+  async save(model) {
     return await model(this).save();
   };
 }

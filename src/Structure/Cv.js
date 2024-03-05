@@ -1,77 +1,75 @@
 import { v4 as uuid } from "uuid";
 import mongoose, { Schema } from "mongoose";
-export default class Cv {
+
+export default class cv {
   userId = null;
   loaded = false;
-  constructor(models, username) {
+
+  constructor(models, username, cv, foundUser) {
     this.models = models;
     this.username = username;
-    this.user = null;
-    this.cv = {
-      id: uuid(),
-      graduationYear: null,
-      displayName: null,
-      // givenname: username?.cv?.givenname,
-      // familyName: username?.cv?.familyName,
-      // emailAddress: username?.cv?.emailAdress,
-      // headline: username?.cv?.headline,
-      // phoneNumber: username?.cv?.phoneNumber,
-      // address: username?.cv?.address,
-      // city: username?.cv?.city,
-      // education: {
-      // education: username?.cv?.education,
-      // eduSchoole: username?.cv?.eduSchoole,
-      // eduCity: username?.cv?.eduCity,
-      // eduStartDate: username?.cv?.eduStartDate,
-      // eduEndDate: username?.cv?.eduEndDate,
-      // },
-      // employment: {
-      // employPosition: username?.cv?.employPosition,
-      // employEmployer: username?.cv?.employEmployer,
-      // employCity: username?.cv?.employCity,
-      // employStartDate: username?.cv?.employStartDate,
-      // employEndDate: username?.cv?.employEndDate,
-      // employDescription: username?.cv?.employDescription,
-      // },
-      // skills: {
-      // skillsLanguage: username?.cv?.skillsLanguage,
-      // skillsCourses: username?.cv?.skillsCourses,
-      // skillsDescription: username?.cv?.skillsDescription,
-      // internship: {
-      // internPosition: username?.cv?.internPosition,
-      // internEmployer: username?.cv?.internEmployer,
-      // internCity: username?.cv?.internCity,
-      // internStartDate: username?.cv?.internStartDate,
-      // internEndDate: username?.cv?.internEndDate,
-      // internDescription: username?.cv?.internDescription,
-      // },
-      // certificate: {
-      // certificateCourse: username?.cv?.certificateCourse,
-      // certificateDescription: username?.cv?.certificateDescription,
-      // certificateQuality: username?.cv?.certificateQuality,
-      // },
-      // achievement: {
-      // achieveDescription: username?.cv?.achieveDescription,
-      // achieveCity: username?.cv?.achieveCity,
-      // achieveDate: username?.cv?.achieveDate,
-
-      // achieveSignature: username?.cv?.achieveSignature,
-      // },
-      // },
-    };
+    this.user = foundUser;
+    this.userId = this.user?.id;
+    this.cv = cv
+      ? cv
+      : {
+          id: uuid(),
+          graduationYear: null,
+          displayName: null,
+          contactInformation: {
+            phone: null,
+            whatsapp: null,
+            email: null,
+          },
+          personalStatement: {
+            name: null,
+            age: null,
+            dateOfBirth: null,
+            profilePhoto: null,
+          },
+          workExperience: [
+            {
+              position: null,
+              title: null,
+              company: null,
+              yearOfExperience: null,
+              projects: [
+                {
+                  name: null,
+                  link: null,
+                },
+              ],
+            },
+          ],
+          education: {
+            faculty: null,
+            yearOfGraduation: null,
+            degree: null,
+          },
+          skills: [],
+          professionalCertifications: [],
+          professionalAssociations: [],
+          languages: [],
+          additionalTrainingCourses: [],
+          conferenceParticipation: [],
+          publications: [],
+          awards: [],
+          bloggingAndInfluencing: [],
+          volunteerExperience: [],
+        };
   }
 
   load = async () => {
-    this.user = await this.models.user.findOne({
-      "credentials.username": this.username,
-    });
+    if (!this.user) {
+      this.user = await this.models.user.findOne({
+        "credentials.username": this.username,
+      });
+      if (!this.user)
+        return console.log(`User [${this.username}] was not found.`);
+      this.userId = this.user.id;
+    }
 
-    if (!this.user)
-      return console.log(`User [${this.username}] was not found.`);
-
-    this.userId = this.user.id;
-
-    const cv = await this.models.cv.findOne({ userId: this.user.id });
+    const cv = await this.models.cv.findOne({ userId: this.userId });
 
     if (cv) this.loaded = true;
 
@@ -80,6 +78,7 @@ export default class Cv {
     return this.cv;
   };
   saveCV = async () => {
+    this.loaded = await this.models.cv.findOne({ userId: this.userId });
     if (!this.user || !this.cv) return;
     if (!this.loaded) {
       // SAVE
@@ -99,7 +98,7 @@ export default class Cv {
     );
     return model;
   };
-  save = async (model) => {
+  async save(model) {
     return await model(this).save();
-  };
+  }
 }
