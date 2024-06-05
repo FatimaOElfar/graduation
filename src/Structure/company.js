@@ -8,10 +8,10 @@ export default class Company {
     this.details = {
       phoneNumber: company?.details?.phoneNumber,
       address: company?.details?.address,
-      TIN : company?.details?.TIN ,
-      yearOfEstablish : company?.details?.yearOfEstablish ,
-      website : company?.details?.website ,
-      companySize : company?.details?.companySize ,
+      TIN: company?.details?.TIN,
+      yearOfEstablish: company?.details?.yearOfEstablish,
+      website: company?.details?.website,
+      companySize: company?.details?.companySize,
     };
     this.credentials = {
       companyName: company?.credentials?.companyName
@@ -19,6 +19,14 @@ export default class Company {
         : company?.credentials?.companyName,
       password: company?.credentials?.password,
     };
+    // this.subscription = Date.now() + 1000 * 60 * 60 * 24 * 30 * 2;
+
+    // //
+    // const sub = this.subscription;
+    // if(sub < Date.now() && sub != -1){
+    //   console.log("Subscription Expired");
+    //   sub = -1;
+    // }
   }
 
   schema = () => {
@@ -32,9 +40,9 @@ export default class Company {
       })
     );
     return model;
-  }
+  };
 
-   save = async (model) => {
+  save = async (model) => {
     return await model(this).save();
-  }
+  };
 }
